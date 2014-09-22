@@ -1,0 +1,616 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>ClassCePackLib</name>
+    </assembly>
+    <members>
+        <member name="T:GicomPack.CTcpClient">
+            <summary>
+            系统的CTcpClient功能有问题，因此在这里重写。
+            </summary>
+        </member>
+        <member name="F:GicomPack.CTcpClient.dTimeOut">
+            <summary>
+            通讯超时时间(对于客户端是发送请求后等待响应的时间，对于服务器是建立连接后连接不活动的时间)
+            </summary>
+        </member>
+        <member name="F:GicomPack.CTcpClient.dConnTimeOut">
+            <summary>
+            连接超时时间
+            </summary>
+        </member>
+        <member name="F:GicomPack.CTcpClient.aIpAddress">
+            <summary>
+            服务器ip地址
+            </summary>
+        </member>
+        <member name="F:GicomPack.CTcpClient.iPort">
+            <summary>
+            服务器端口号
+            </summary>
+        </member>
+        <member name="M:GicomPack.CTcpClient.Connect(System.Net.IPAddress,System.Int32)">
+            <summary>
+            通过指定的IPAddress类型的ip地址和端口号连接服务器
+            </summary>
+            <param name="aIPAddress"></param>
+            <param name="iPort"></param>
+        </member>
+        <member name="M:GicomPack.CTcpClient.Connect(System.String,System.Int32)">
+            <summary>
+            通过指定的主机名和端口号连接服务器
+            </summary>
+            <param name="hostname"></param>
+            <param name="iPort"></param>
+        </member>
+        <member name="M:GicomPack.CTcpClient.Close">
+            <summary>
+            关闭连接
+            </summary>
+        </member>
+        <member name="M:GicomPack.CTcpClient.WaitBuffer(System.Byte[]@,System.Int32,System.Boolean)">
+            <summary>
+            从与客户端连接的socket中读取revLen长度的数据
+            </summary>
+            <param name="buffer"></param>
+            <param name="rcvLen"></param>
+            <param name="cWaitMode">等待方式 false 超时退出 true一直等待 </param>
+            <returns>成功返回读取的长度，应该与revLen相等，失败返回负值</returns>
+        </member>
+        <member name="M:GicomPack.CTcpClient.ConnectServer">
+            <summary>
+            通过预先设定的静态成员aIpAddress或hostname及iPort与服务器建立连接
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:GicomPack.CTcpClient.WaitForRead">
+            <summary>
+            等待可读取状态，超过指定的超时时间后会退出
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:ClassCePackLib.Bytebuffer.#ctor(System.Int32,System.Int32)">
+            <summary>
+            
+            </summary>
+            <param name="initSize">初时尺寸</param>
+            <param name="extSize">扩充尺寸</param>
+        </member>
+        <member name="M:ClassCePackLib.Bytebuffer.#ctor(System.Int32)">
+            <summary>
+            
+            </summary>
+            <param name="initSize">初时尺寸</param>
+        </member>
+        <member name="T:GicomPack.CPack">
+            <summary>
+            报文处理类
+            </summary>
+        </member>
+        <member name="F:GicomPack.CPack.deslock">
+            <summary>
+            加解密报文锁
+            </summary>
+        </member>
+        <member name="F:GicomPack.CPack.bSecret">
+            <summary>
+            是否加密
+            </summary>
+        </member>
+        <member name="F:GicomPack.CPack.bytesSecretKey">
+            <summary>
+            固定加密密钥
+            </summary>
+        </member>
+        <member name="F:GicomPack.CPack.iKeyMode">
+            <summary>
+            工作密钥类型  1-DES 2-3DES
+            </summary>
+        </member>
+        <member name="F:GicomPack.CPack.iSecretMode">
+            <summary>
+            工作密钥交换方式  0-固定密钥 1-动态密钥
+            </summary>
+        </member>
+        <member name="F:GicomPack.CPack.htSecretKey">
+            <summary>
+            手持工作密钥哈希表
+            </summary>
+        </member>
+        <member name="F:GicomPack.CPack.resendTimes">
+            <summary>
+            客户端重发次数
+            </summary>
+        </member>
+        <member name="M:GicomPack.CPack.#ctor(System.Int32)">
+            <summary>
+            创建CPack(客户端使用)
+            </summary>
+            <param name="transcode"></param>
+        </member>
+        <member name="M:GicomPack.CPack.in2out(GicomPack.CPack,GicomPack.CPack)">
+            <summary>
+            将请求报文对象的相关属性赋给响应报文对象
+            </summary>
+            <param name="inpack"></param>
+            <param name="outpack"></param>
+        </member>
+        <member name="M:GicomPack.CPack.getClientId">
+            <summary>
+            取设备号并去掉'-'作为手持标识号
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:GicomPack.CPack.getPackTimeStamp(System.Boolean)">
+            <summary>
+            获取报文时间戳格式("yyMMddhhmmss+ms"),精确到毫秒
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:GicomPack.CPack.AddPackName(System.String)">
+            <summary>
+            添加报文项名称
+            </summary>
+            <param name="strName"></param>
+            <returns></returns>
+        </member>
+        <member name="M:GicomPack.CPack.getDataPos(System.String,System.Int32@)">
+            <summary>
+            根据数据项名称获得数据项在数据报文中的位置
+            TODO:应改名为getDataPosByName
+            </summary>
+            <param name="strName"></param>
+            <param name="iDataPos"></param>
+            <returns></returns>
+        </member>
+        <member name="M:GicomPack.CPack.GetPack(System.String,System.Int32@)">
+            <summary>
+            
+            </summary>
+            <param name="strName"></param>
+            <param name="xValue"></param>
+            <returns></returns>
+        </member>
+        <member name="M:GicomPack.CPack.ResetLen(System.Byte[],System.Int32)">
+            <summary>
+            重置bytesBuffer的尺寸为iLength
+            </summary>
+            <param name="bytesBuffer"></param>
+            <param name="iLength"></param>
+            <returns>改变尺寸后的数组</returns>
+        </member>
+        <member name="M:GicomPack.CPack.ByteToInt(System.Byte[],System.Int32,System.Int32@)">
+            <summary>
+            将数组bytesTo的iFrom位置的4个字节转换为int类型
+            TODO:应该改名为unpackInt。
+            </summary>
+            <param name="bytesTo"></param>
+            <param name="iFrom"></param>
+            <param name="iValue"></param>
+            <returns></returns>
+        </member>
+        <member name="M:GicomPack.CPack.IntToByte(System.Byte[]@,System.Int32,System.Int32)">
+            <summary>
+            将ing型的iValue加入到数组bytesTo的iFrom位置
+            TODO:建议改名。
+            </summary>
+            <param name="bytesTo"></param>
+            <param name="iFrom"></param>
+            <param name="iValue"></param>
+            <returns></returns>
+        </member>
+        <member name="M:GicomPack.CPack.ByteToLong(System.Byte[],System.Int32,System.Int64@)">
+            <summary>
+            将数组bytesTo的iFrom位置的8个字节转换为long类型
+            TODO:TODO:建议改名。
+            </summary>
+            <param name="bytesTo"></param>
+            <param name="iFrom"></param>
+            <param name="iValue"></param>
+            <returns></returns>
+        </member>
+        <member name="M:GicomPack.CPack.LongToByte(System.Byte[]@,System.Int32,System.Int64)">
+            <summary>
+            将long型的iValue加入到数组bytesTo的iFrom位置
+            TODO:TODO:建议改名。
+            </summary>
+            <param name="bytesTo"></param>
+            <param name="iFrom"></param>
+            <param name="iValue"></param>
+            <returns></returns>
+        </member>
+        <member name="M:GicomPack.CPack.StringToInt(System.String)">
+            <summary>
+            </summary>
+            <param name="aString"></param>
+            <returns></returns>
+        </member>
+        <member name="M:GicomPack.CPack.WriteUnPack(System.String)">
+            <summary>
+            向调试文件中写入解包数据
+            </summary>
+            <param name="strName"></param>
+            <returns></returns>
+        </member>
+        <member name="T:GicomPack.CPack.PackErrCode">
+            <summary>
+            报协议错误码
+            </summary>
+        </member>
+        <member name="F:GicomPack.CPack.PackErrCode.InitKeyErr">
+            <summary>
+            初始化工作密钥失败
+            </summary>
+        </member>
+        <member name="F:GicomPack.CPack.PackErrCode.UnKnowPackErr">
+            <summary>
+            未知报文类型
+            </summary>
+        </member>
+        <member name="F:GicomPack.CPack.PackErrCode.NullKeyErr">
+            <summary>
+            工作密钥为初始化
+            </summary>
+        </member>
+        <member name="F:GicomPack.CPack.PackErrCode.DecPackErr">
+            <summary>
+            报文解密失败
+            </summary>
+        </member>
+        <member name="F:GicomPack.CPack.PackErrCode.MD5Err">
+            <summary>
+            报文MD5检查失败
+            </summary>
+        </member>
+        <member name="F:GicomPack.CPack.PackErrCode.CliUNRegErr">
+            <summary>
+            客户端注册码错误
+            </summary>
+        </member>
+        <member name="F:GicomPack.CPack.PackErrCode.AppErr">
+            <summary>
+            应用层错误
+            </summary>
+        </member>
+        <member name="F:GicomPack.CPack.PackErrCode.Success">
+            <summary>
+            没有错误
+            </summary>
+        </member>
+        <member name="F:GicomPack.CPack.PackType.Sync">
+            <summary>
+            同步
+            </summary>
+        </member>
+        <member name="F:GicomPack.CPack.PackType.Msg">
+            <summary>
+            消息
+            </summary>
+        </member>
+        <member name="F:GicomPack.CPack.PackVersion.v10">
+            <summary>
+            1.0版本
+            </summary>
+        </member>
+        <member name="F:GicomPack.CPack.PackVersion.v11">
+            <summary>
+            1.1版本
+            </summary>
+        </member>
+        <member name="M:ClassCePackLib.IbsRecordSet.getValue(System.Int32,System.String)">
+            <summary>
+            获取指定行上、指定列名称的数据
+            </summary>
+            <param name="rowIndex">行索引</param>
+            <param name="itemName">列名称</param>
+            <returns>成功返回string类型的数据内容;失败返回null,可以根据strLastError获得错误信息</returns>
+        </member>
+        <member name="M:ClassCePackLib.IbsRecordSet.getValue(System.Int32,System.Int32)">
+            <summary>
+            获取指定行列上的数据
+            </summary>
+            <param name="rowIndex">行索引</param>
+            <param name="columIndex">列索引</param>
+            <returns>成功返回string类型的数据内容;失败返回null,可以根据strLastError获得错误信息</returns>
+        </member>
+        <member name="T:GicomPack.CDeviceID">
+            <summary>
+            CDeviceID 的摘要说明。
+            </summary>
+        </member>
+        <member name="M:GicomPack.CDeviceID.CheckSerial(System.String,System.String,System.Int32)">
+            <summary>
+            
+            </summary>
+            <param name="strSerial"></param>
+            <param name="strDeviceID"></param>
+            <param name="iSvrFlg">1 服务器 0 客户端 3 客户端脱机模式注册</param>
+            <returns></returns>
+        </member>
+        <member name="P:GicomPack.CDeviceID.DeviceType">
+            <summary>
+            按照设备类型获取MAC号
+            </summary>
+        </member>
+        <member name="T:GicomPack.CBase32">
+            <summary>
+            Summary description for CBase32.
+            </summary>
+        </member>
+        <member name="T:GicomPack.CommonUtil">
+            <summary>
+            通用工具函数类
+            </summary>
+        </member>
+        <member name="M:GicomPack.CommonUtil.GetCurrentDirectory">
+            <summary>
+            获得当前工作路径
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:GicomPack.CommonUtil.GetCurWeekDate(System.DayOfWeek)">
+            <summary>
+            获得当前周指定星期几的日期
+            </summary>
+            <param name="dw">DayOfWeek类型表示的星期几</param>
+            <returns>八位数字字符串表示的日期yyyymmdd</returns>
+        </member>
+        <member name="M:GicomPack.CommonUtil.GetCurDateTime">
+            <summary>
+            yyMMddhhssmm
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="T:GicomPack.CIni">
+            <summary>
+            ini 配置文件读写
+            TODO:应该使用“单例”来创建实例，以提高效率
+            TODO:考虑使用Nini或Win32 api调用实现,好处：稳定代码，速度更快
+            Nini还可以读取配置文件和注册表
+            </summary>
+        </member>
+        <member name="M:GicomPack.CIni.#ctor">
+            <summary>
+            </summary>
+        </member>
+        <member name="M:GicomPack.CIni.SetCrypto(System.String)">
+            <summary>
+            TODO:使用map优化!
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:GicomPack.CIni.getAllSegName">
+            <summary>
+            获取所有段中同名的项目的值
+            </summary>
+            <param name="itemName"></param>
+            <returns></returns>
+        </member>
+        <member name="M:GicomPack.CIni.HexToBytes(System.String,System.Byte[]@)">
+            <summary>
+            TODO:应该放在公共库中
+            </summary>
+            <param name="strHex"></param>
+            <param name="aBytes"></param>
+            <returns></returns>
+        </member>
+        <member name="M:GicomPack.CIni.BytesToHex(System.String@,System.Byte[])">
+            <summary>
+            TODO:应该放在公共库中
+            </summary>
+            <param name="strHex"></param>
+            <param name="aBytes"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Common.StopWatch.getDuration">
+            <summary>
+            返回计时（单位：毫秒）
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="T:GicomPack.CDes">
+            <summary>
+            Des 的摘要说明。
+            </summary>
+        </member>
+        <member name="M:GicomPack.CCerFile.#ctor(System.String)">
+            <summary>
+            默认为客户端方式，读取当前目录下证书文件
+            </summary>
+        </member>
+        <member name="M:GicomPack.CCerFile.Init(System.String)">
+            <summary>
+            加载证书文件
+            </summary>
+            <param name="strEncKey">证书文件加密密钥</param>
+            <returns></returns>
+        </member>
+        <member name="M:GicomPack.CCerFile.Update(System.String)">
+            <summary>
+            改变证书文件加密密钥,须首先加载证书文件
+            </summary>
+            <param name="strNewEncKey">新证书文件密钥</param>
+            <returns></returns>
+        </member>
+        <member name="M:GicomPack.CCerFile.SaveCerFile(System.String)">
+            <summary>
+            保存证书文件
+            </summary>
+            <param name="strEncKey">证书文件加密密钥</param>
+            <returns></returns>
+        </member>
+        <member name="F:GicomPack.CRSA.RSAKeySize">
+            <summary>
+            指定RSA算法密钥长度，默认1024bits
+            </summary>
+        </member>
+        <member name="F:GicomPack.CRSA.SVRFILE_CRTKEY_">
+            <summary>
+            服务器文件加密密钥
+            </summary>
+        </member>
+        <member name="F:GicomPack.CRSA.sysPBK_">
+            <summary>
+            系统交易使用公共密钥
+            </summary>
+        </member>
+        <member name="M:GicomPack.CRSA.ExportKeyXml(System.String@,System.String@)">
+            <summary>
+            生成公钥和私钥信息
+            </summary>
+        </member>
+        <member name="M:GicomPack.CRSA.RSAEncrypt(System.String,System.String)">
+            <summary>
+            RSA的加密函数
+            </summary>
+            <param name="xmlPublicKey">公钥信息(XML格式)</param>
+            <param name="m_strEncryptString">需要加密的字符串,string</param>
+            <returns>加密后的字符串</returns>
+        </member>
+        <member name="M:GicomPack.CRSA.RSAEncrypt(System.String,System.Byte[])">
+            <summary>
+            RSA的加密函数
+            </summary>
+            <param name="xmlPublicKey">公钥信息(XML格式)</param>
+            <param name="EncryptString">需要加密的byte数组,byte[]</param>
+            <returns>加密后的字符串</returns>
+        </member>
+        <member name="M:GicomPack.CRSA.RSADecrypt(System.String,System.String)">
+            <summary>
+            RSA的解密函数
+            </summary>
+            <param name="xmlPrivateKey">私钥信息(XML格式)</param>
+            <param name="m_strDecryptString">需要解密的字符串,string</param>
+            <returns>解密后的字符串</returns>
+        </member>
+        <member name="M:GicomPack.CRSA.RSADecrypt(System.String,System.Byte[])">
+            <summary>
+            RSA的解密函数
+            </summary>
+            <param name="xmlPrivateKey">私钥信息(XML格式)</param>
+            <param name="DecryptString">需要解密的byte数组,byte[]</param>
+            <returns>解密后的字符串</returns>
+        </member>
+        <member name="M:GicomPack.CRSA.GetHash(System.String,System.Byte[]@)">
+            <summary>
+            获取Hash描述表
+            </summary>
+            <param name="m_strSource">需要Hash源字符串</param>
+            <param name="HashData">返回Hash信息byte数组,byte[]</param>
+            <returns></returns>
+        </member>
+        <member name="M:GicomPack.CRSA.GetHash(System.String,System.String@)">
+            <summary>
+            获取Hash描述表
+            </summary>
+            <param name="m_strSource">需要Hash源字符串</param>
+            <param name="strHashData">返回Hash信字符串,string</param>
+            <returns></returns>
+        </member>
+        <member name="M:GicomPack.CRSA.GetHash(System.IO.FileStream,System.Byte[]@)">
+            <summary>
+            获取Hash描述表
+            </summary>
+            <param name="objFile">需要Hash源文件</param>
+            <param name="HashData">返回Hash信byte数组,byte[]</param>
+            <returns></returns>
+        </member>
+        <member name="M:GicomPack.CRSA.GetHash(System.IO.FileStream,System.String@)">
+            <summary>
+            获取Hash描述表
+            </summary>
+            <param name="objFile">需要Hash源文件</param>
+            <param name="strHashData">返回Hash信字符串,string</param>
+            <returns></returns>
+        </member>
+        <member name="M:GicomPack.CRSA.SignatureFormatter(System.String,System.Byte[],System.Byte[]@)">
+            <summary>
+            RSA签名
+            </summary>
+            <param name="p_strKeyPrivate">私钥信息XML字符串</param>
+            <param name="HashbyteSignature">签名源信息byte数组,byte[]</param>
+            <param name="EncryptedSignatureData">返回签名密文信息byte数组,byte[]</param>
+            <returns></returns>
+        </member>
+        <member name="M:GicomPack.CRSA.SignatureFormatter(System.String,System.Byte[],System.String@)">
+            <summary>
+            RSA签名
+            </summary>
+            <param name="p_strKeyPrivate">私钥信息XML字符串</param>
+            <param name="HashbyteSignature">签名源信息byte数组,byte[]</param>
+            <param name="m_strEncryptedSignatureData">返回签名密文信息字符串,string</param>
+            <returns></returns>
+        </member>
+        <member name="M:GicomPack.CRSA.SignatureFormatter(System.String,System.String,System.Byte[]@)">
+            <summary>
+            RSA签名
+            </summary>
+            <param name="p_strKeyPrivate">私钥信息XML字符串</param>
+            <param name="m_strHashbyteSignature">签名源信息字符串,string</param>
+            <param name="EncryptedSignatureData">返回签名密文信息byte数组,byte[]</param>
+            <returns></returns>
+        </member>
+        <member name="M:GicomPack.CRSA.SignatureFormatter(System.String,System.String,System.String@)">
+            <summary>
+            RSA签名
+            </summary>
+            <param name="p_strKeyPrivate">私钥信息XML字符串</param>
+            <param name="m_strHashbyteSignature">签名源信息字符串,string</param>
+            <param name="m_strEncryptedSignatureData">返回签名密文信息字符串,string</param>
+            <returns></returns>
+        </member>
+        <member name="M:GicomPack.CRSA.SignatureDeformatter(System.String,System.Byte[],System.Byte[])">
+            <summary>
+            RSA签名验证
+            </summary>
+            <param name="p_strKeyPublic">公钥信息XML字符串</param>
+            <param name="HashbyteDeformatter">签名源信息byte数组,byte[]</param>
+            <param name="DeformatterData">签名密文信息byte数组,byte[]</param>
+            <returns>true 验证成功 false 验证失败</returns>
+        </member>
+        <member name="M:GicomPack.CRSA.SignatureDeformatter(System.String,System.String,System.Byte[])">
+            <summary>
+            RSA签名验证
+            </summary>
+            <param name="p_strKeyPublic">公钥信息XML字符串</param>
+            <param name="p_strHashbyteDeformatter">签名源信息字符串,string</param>
+            <param name="DeformatterData">签名密文信息byte数组,byte[]</param>
+            <returns>true 验证成功 false 验证失败</returns>
+        </member>
+        <member name="M:GicomPack.CRSA.SignatureDeformatter(System.String,System.Byte[],System.String)">
+            <summary>
+            RSA签名验证
+            </summary>
+            <param name="p_strKeyPublic">公钥信息XML字符串</param>
+            <param name="HashbyteDeformatter">签名源信息byte数组,byte[]</param>
+            <param name="p_strDeformatterData">签名密文信息字符串,string</param>
+            <returns>true 验证成功 false 验证失败</returns>
+        </member>
+        <member name="M:GicomPack.CRSA.SignatureDeformatter(System.String,System.String,System.String)">
+            <summary>
+            RSA签名验证
+            </summary>
+            <param name="p_strKeyPublic">公钥信息XML字符串</param>
+            <param name="p_strHashbyteDeformatter">签名源信息字符串,string</param>
+            <param name="p_strDeformatterData">签名密文信息字符串,string</param>
+            <returns>true 验证成功 false 验证失败</returns>
+        </member>
+        <member name="M:GicomPack.CRSA.GenerateBytes(System.Int32)">
+            <summary>
+            随机生成一指定长度的字节数组
+            </summary>
+            <param name="byteLength">指定长度</param>
+            <returns></returns>
+        </member>
+        <member name="M:GicomPack.CRSA.FromXmlString(System.String,System.Boolean)">
+            <summary>
+            通过 XML 字符串中的密钥信息初始化 RSA 参数对象
+            </summary>
+        </member>
+        <member name="M:GicomPack.CRSA.ToXmlString(System.Security.Cryptography.RSAParameters,System.Boolean)">
+            <summary>
+            RSA 参数对象导出到 XML 字符串中
+            </summary>
+        </member>
+    </members>
+</doc>
